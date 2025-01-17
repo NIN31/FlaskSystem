@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        header {
+            background-color: #007BFF;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+        header a {
+            color: white;
+            text-decoration: none;
+            font-size: 1.2rem;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #007BFF;
+        }
+        form {
+            margin-bottom: 1.5rem;
+        }
+        label {
+            font-weight: bold;
+        }
+        input, select, button {
+            margin-top: 0.5rem;
+            padding: 0.5rem;
+            width: 100%;
+            max-width: 300px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #007BFF;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .delete-btn {
+            background-color: red;
+            color: white;
+        }
+        .clear-btn {
+            background-color: orange;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Admin Panel</h1>
+        <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </header>
+    <div class="container">
+        <!-- Filter Form -->
+        <form method="GET" action="/admin">
+            <label for="name">Filter by Name:</label>
+            <input type="text" id="name" name="name" placeholder="Employee Name" value="{{ request.args.get('name', '') }}">
+
+            <label for="date_from">From Date:</label>
+            <input type="date" id="date_from" name="date_from" value="{{ request.args.get('date_from', '') }}">
+
+            <label for="date_to">To Date:</label>
+            <input type="date" id="date_to" name="date_to" value="{{ request.args.get('date_to', '') }}">
+
+            <button type="submit"><i class="fas fa-filter"></i> Apply Filters</button>
+        </form>
+
+        <!-- Export Button -->
+        <form method="GET" action="/export">
+            <input type="hidden" name="name" value="{{ request.args.get('name', '') }}">
+            <input type="hidden" name="date_from" value="{{ request.args.get('date_from', '') }}">
+            <input type="hidden" name="date_to" value="{{ request.args.get('date_to', '') }}">
+            <button type="submit"><i class="fas fa-download"></i> Export CSV</button>
+        </form>
+
+        <!-- Reset Button -->
+        <form method="POST" action="/reset" onsubmit="return confirm('Are you sure you want to delete all attendance records? This action cannot be undone.');">
+            <button type="submit" class="delete-btn"><i class="fas fa-trash"></i> Reset All Records</button>
+        </form>
+
+        <!-- Records Table -->
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Action</th>
+                    <th>Timestamp</th>
+                    <th>Delete Entry</th>
+                    <th>Clear Restrictions</th> <!-- New Column -->
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in records %}
+                <tr>
+                    <td>{{ record.id }}</td>
+                    <td>{{ record.name }}</td>
+                    <td>{{ record.action }}</td>
+                    <td>{{ record.timestamp }}</td>
+                    <td>
+                        <form method="POST" action="/delete_entry">
+                            <input type="hidden" name="record_id" value="{{ record.id }}">
+                            <button type="submit" class="delete-btn"><i class="fas fa-trash"></i> Delete</button>
+                        </form>
+                    </td>
+                    <td>
+                        <form method="POST" action="/clear_restriction">
+                            <input type="hidden" name="browser_id" value="{{ record.browser_id }}"> <!-- Pass browser ID -->
+                            <button type="submit" class="clear-btn"><i class="fas fa-eraser"></i> Clear Restrictions</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

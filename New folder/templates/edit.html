@@ -1,0 +1,29 @@
+<!-- edit.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Record</title>
+    <style>
+        /* Same styling as the form in admin.html */
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Edit Record</h1>
+        <form method="POST">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" value="{{ record.name }}" required>
+
+            <label for="action">Action:</label>
+            <select id="action" name="action" required>
+                <option value="Sign In" {% if record.action == 'Sign In' %}selected{% endif %}>Sign In</option>
+                <option value="Sign Out" {% if record.action == 'Sign Out' %}selected{% endif %}>Sign Out</option>
+            </select>
+
+            <button type="submit">Update</button>
+        </form>
+    </div>
+</body>
+</html>
